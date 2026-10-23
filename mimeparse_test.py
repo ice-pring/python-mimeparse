@@ -68,6 +68,22 @@ class MimeParseTestCase(unittest.TestCase):
         for args, expected, description in self.test_data['best_match']:
             self._test_best_match(args, expected, description)
 
+    def test_best_match_empty_iterables(self):
+        for supported in ((), iter([]), (item for item in [])):
+            with self.subTest(supported=supported):
+                self.assertEqual(mimeparse.best_match(supported, '*/*'), '')
+
+    def test_best_match_generator(self):
+        supported = (item for item in ['text/plain', 'application/json'])
+        self.assertEqual(
+            mimeparse.best_match(supported, 'application/json'),
+            'application/json',
+        )
+
+    def test_best_match_empty_supported_invalid_header(self):
+        with self.assertRaises(mimeparse.MimeTypeParseException):
+            mimeparse.best_match([], 'invalid')
+
     def test_parse_mime_type(self):
         for args, expected in self.test_data['parse_mime_type']:
             self._test_parse_mime_type(args, expected)

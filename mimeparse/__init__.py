@@ -188,7 +188,7 @@ def best_match(supported: Iterable[str], header: str) -> str:
     conforms to the format of the HTTP Accept: header. The value of 'supported'
     is a list of mime-types. The list of supported mime-types should be sorted
     in order of increasing desirability, in case of a situation where there is
-    a tie.
+    a tie. Returns an empty string if no supported mime-type is acceptable.
 
     >>> best_match(['application/xbel+xml', 'text/xml'],
                    'text/*;q=0.5,*/*; q=0.1')
@@ -205,6 +205,8 @@ def best_match(supported: Iterable[str], header: str) -> str:
             mime_type
         ))
         pos += 1
+    if not weighted_matches:
+        return ''
     weighted_matches.sort()
 
     return weighted_matches[-1][0][0] and weighted_matches[-1][2] or ''

@@ -68,6 +68,14 @@
     "best_match": [
         [
             [
+                [],
+                "application/json"
+            ],
+            "",
+            "no match when no media types are supported"
+        ],
+        [
+            [
                 ["application/json", "text/html"],
                 "application/json, text/javascript, */*"
             ],
