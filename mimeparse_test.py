@@ -68,6 +68,30 @@ class MimeParseTestCase(unittest.TestCase):
         for args, expected, description in self.test_data['best_match']:
             self._test_best_match(args, expected, description)
 
+    def test_quoted_commas(self):
+        values = (
+            r'"a,b"',
+            r'"a\",b"',
+            r'"a\\,b"',
+            r'"a,b\\"',
+            r'"a;b,c"',
+            r'"a,\"b,c\""',
+        )
+        for value in values:
+            with self.subTest(value=value):
+                media_type = f'text/plain;note={value}'
+                header = f'{media_type},application/json;q=0.2'
+                self.assertEqual(mimeparse.quality(media_type, header), 1)
+                self.assertEqual(
+                    mimeparse.best_match([media_type, 'application/json'], header),
+                    media_type,
+                )
+
+    def test_quoted_commas_with_blank_ranges(self):
+        media_type = 'text/plain;note="a,b"'
+        header = f', {media_type}, , '
+        self.assertEqual(mimeparse.best_match([media_type], header), media_type)
+
     def test_parse_mime_type(self):
         for args, expected in self.test_data['parse_mime_type']:
             self._test_parse_mime_type(args, expected)

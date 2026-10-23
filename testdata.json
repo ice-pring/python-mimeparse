@@ -16,6 +16,20 @@
     "quality": [
         [
             [
+                "text/plain;profile=\"a,b\"",
+                "text/plain;profile=\"a,b\";q=0.8, application/json;q=0.2"
+            ],
+            0.8
+        ],
+        [
+            [
+                "application/json",
+                "text/plain;profile=\"a,b\";q=0.8, application/json;q=0.2"
+            ],
+            0.2
+        ],
+        [
+            [
                 "text/html;level=1",
                 "text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5"
             ],
@@ -66,6 +80,22 @@
     ],
 
     "best_match": [
+        [
+            [
+                ["text/plain;profile=\"a,b\"", "application/json"],
+                "text/plain;profile=\"a,b\";q=0.8, application/json;q=0.2"
+            ],
+            "text/plain;profile=\"a,b\"",
+            "preserve a comma within a quoted parameter value"
+        ],
+        [
+            [
+                ["text/plain;profile=\"a,b\"", "application/json"],
+                "text/plain;profile=\"a,b\";q=0.2, application/json;q=0.8"
+            ],
+            "application/json",
+            "compare quality factors after a quoted parameter containing a comma"
+        ],
         [
             [
                 ["application/json", "text/html"],

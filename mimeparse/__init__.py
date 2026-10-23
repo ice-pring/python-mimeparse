@@ -175,7 +175,7 @@ def quality(mime_type: str, ranges: str) -> float:
                   text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5')
     0.7
     """
-    parsed_ranges = [parse_media_range(r) for r in ranges.split(',')]
+    parsed_ranges = [parse_media_range(r) for r in _split_media_ranges(ranges)]
 
     return quality_parsed(mime_type, parsed_ranges)
 
@@ -194,7 +194,7 @@ def best_match(supported: Iterable[str], header: str) -> str:
                    'text/*;q=0.5,*/*; q=0.1')
     'text/xml'
     """
-    split_header = _filter_blank(header.split(','))
+    split_header = _filter_blank(_split_media_ranges(header))
     parsed_header = [parse_media_range(r) for r in split_header]
     weighted_matches = []
     pos = 0
@@ -208,6 +208,28 @@ def best_match(supported: Iterable[str], header: str) -> str:
     weighted_matches.sort()
 
     return weighted_matches[-1][0][0] and weighted_matches[-1][2] or ''
+
+
+def _split_media_ranges(header: str) -> Generator[str, None, None]:
+    """Split an Accept list without splitting quoted parameter values."""
+    if '"' not in header:
+        yield from header.split(',')
+        return
+
+    start = 0
+    quoted = False
+    escaped = False
+    for index, char in enumerate(header):
+        if escaped:
+            escaped = False
+        elif quoted and char == '\\':
+            escaped = True
+        elif char == '"':
+            quoted = not quoted
+        elif char == ',' and not quoted:
+            yield header[start:index]
+            start = index + 1
+    yield header[start:]
 
 
 def _filter_blank(i: Iterable[str]) -> Generator[str, None, None]:
